@@ -1,9 +1,11 @@
 #include "sdl_config.h"
+#include "chip8.h"
+
 #include <iostream>
 #include <SDL.h>
 #include <vector>
 
-#pragma region Constructor and Destructor
+#pragma region Constructor & Destructor
 	
 	/// <summary>
 	/// sdl_config class constructor
@@ -50,7 +52,7 @@
 	/// Properly destroys SDL Objects and stops SDL components
 	/// </summary>
 	sdl_config::~sdl_config() {
-		printf("Disposing SDL Objects");
+		printf("Disposing SDL Objects\n");
 		SDL_DestroyWindow(window);
 		SDL_DestroyRenderer(renderer);
 		SDL_Quit();
@@ -75,7 +77,6 @@
 
 		return color;
 	}
-
 	/// <summary>
 	/// Sets the screen to a color (Background)
 	/// </summary>

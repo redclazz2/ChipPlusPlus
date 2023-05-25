@@ -1,3 +1,6 @@
+#pragma once
+#include "chip8.h"
+
 #include <iostream>
 #include <SDL.h>
 #include <vector>;
@@ -19,5 +22,5 @@ class sdl_config {
 		~sdl_config();
 	
 		void clear_display();
-		void update_display();
+		void update_display();		
 };
