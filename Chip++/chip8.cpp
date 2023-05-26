@@ -190,7 +190,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             printf("R:Skipping if VX(0x%04X) == NN(0x%04X).\n",this->registers[X],NN);
             if (this->registers[X] == NN) {
                 this->PC += 2;
-                printf("Skipped!\n");
+                printf("---->Skipped!\n");
             }
             break;
 
@@ -198,7 +198,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             printf("R:Skipping if VX(0x%04X) != NN(0x%04X).\n",this->registers[X],NN);
             if (this->registers[X] != NN) {
                 this->PC += 2;
-                printf("Skipped!\n");
+                printf("---->Skipped!\n");
             }
             break;
 
@@ -206,7 +206,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             printf("R:Skipping if VX(0x%04X) == VY(0x%04X).\n",this->registers[X],this->registers[Y]);
             if (this->registers[X] == this->registers[Y]) {
                 this->PC += 2;
-                printf("Skipped!\n");
+                printf("---->Skipped!\n");
             }
             break;
 
@@ -216,15 +216,44 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             break;
 
         case 0x07:
-            printf("R:Add NN to V[x]\n");
+            printf("R:Add NN(0x%04X) to V[x](0x%04X)\n",NN,this->registers[X]);
             this->registers[X] += NN;
+            printf("---->Result: (0x%04X)\n",this->registers[X]);
+            break;
+
+        case 0x08:
+            switch(N){
+                case 0:
+                    printf("R:Set VX(0x%04X) to the value of VY(0x%04X)\n",this->registers[X],this->registers[Y]);
+                    this->registers[X] = this->registers[Y];
+                    printf("---->Result: (0x%04X)\n", this->registers[X]);
+                    break;
+
+                /*
+                
+                
+                
+                
+                
+                        CONTINUE HERE 5/26/23
+                
+                
+                
+                
+                
+                */
+
+                default:
+                    printf("E:Unimplemented instruction 0x%04X\n", instruction);
+                    break;
+            }
             break;
 
         case 0x09:
             printf("R:Skipping if VX(0x%04X) != VY(0x%04X).\n", this->registers[X], this->registers[Y]);
             if (this->registers[X] != this->registers[Y]) {
                 this->PC += 2;
-                printf("Skipped!\n");
+                printf("---->Skipped!\n");
             }
             break;
 
