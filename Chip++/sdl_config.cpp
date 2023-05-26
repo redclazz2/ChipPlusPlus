@@ -1,9 +1,4 @@
 #include "sdl_config.h"
-#include "chip8.h"
-
-#include <iostream>
-#include <SDL.h>
-#include <vector>
 
 #pragma region Constructor & Destructor
 	
@@ -89,7 +84,42 @@
 	/// <summary>
 	/// Updates Display Data Based On Chip8's Display, then presents the renderer with SDL.
 	/// </summary>
-	void sdl_config::update_display() {
+	void sdl_config::update_display(chip8* chip) {
+
+		SDL_Rect rect = { 0,0,scale_factor,scale_factor };
+
+		std::vector<uint8_t> bcolor = sdl_config_get_rgba(&bg_color);
+		std::vector<uint8_t> fcolor = sdl_config_get_rgba(&fg_color);
+
+		//Loop through display pixels, draw a rectangle per pixel to the SDL Window
+		for (uint32_t i = 0; i < sizeof chip->display; i++) {
+			rect.x = (i % window_width) * scale_factor;
+			rect.y = (i / window_height) * scale_factor;
+
+			if (chip->display[i]) {
+				//Pixel is on draw foreground
+				SDL_SetRenderDrawColor(renderer, fcolor[0], fcolor[1], fcolor[2], fcolor[3]);
+				SDL_RenderFillRect(renderer, &rect);
+
+				//Adds pixelated effect
+				SDL_SetRenderDrawColor(renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
+				SDL_RenderDrawRect(renderer, &rect);
+			}
+			else {
+				//Pixel is Off
+				SDL_SetRenderDrawColor(renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
+				SDL_RenderFillRect(renderer, &rect);
+			}
+		}
+
+
 		SDL_RenderPresent(this->renderer);
+	}
+	/// <summary>
+	/// Returns a vector with the width and height of the window
+	/// </summary>
+	/// <returns></returns>
+	std::vector<uint32_t> sdl_config::get_window_dimen() {
+		return std::vector<uint32_t> {window_width, window_height};
 	}
 #pragma endregion

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <stack>
+#include <vector>
 
 class chip8{
 	public:
@@ -11,11 +12,11 @@ class chip8{
 			RUNNING,
 			PAUSED
 		};
+		bool display[64 * 32];	//Original resolution of display
 
 	private:
 		emulator_state state;		//Emulator Status, Based on ENUM
 		uint8_t ram[4096];			//4096 bytes of ram
-		uint8_t display[64 * 32];	//Original resolution of display
 		uint16_t PC;				//Program Counter, Points at current instruction in memory
 		uint16_t I;					//I Register, Points at a location in memory
 		uint8_t registers[16];		//Registers V0-VF
@@ -31,5 +32,6 @@ class chip8{
 
 		emulator_state getEmulatorState();
 		void handle_input();
+		void handle_instructions(std::vector<uint32_t> dimensions);
 };
 

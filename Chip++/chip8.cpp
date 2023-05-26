@@ -1,9 +1,5 @@
 #include "chip8.h"
 
-#include <iostream>
-#include <SDL.h>
-#include <vector>
-
 #pragma region Constructor & Destructor
     //Constructor of chip8
     chip8::chip8(const char rom_name[]) {
@@ -121,5 +117,132 @@ void chip8::handle_input() {
         default:
             break;
         }
+    }
+}
+
+/// <summary>
+/// Handles instructions based on OPCODES for chip8
+/// </summary>
+void chip8::handle_instructions(std::vector<uint32_t> dimensions){
+    
+    /*
+        | lets store two 8bit numbers in 16bits
+        Since Chip8 instructions are read from 2 bytes
+        first you read the PC pointer shifted from left 1 byte then the next direction (+1)
+        Finally increase PC + 2 for next iteration
+    */
+
+    uint16_t instruction = (this->ram[this->PC] << 8) | this->ram[this->PC + 1];
+    printf("Address: 0x%04X, Opcode: 0x%04X\n",PC, instruction);
+    this->PC += 2;
+
+    /*Opcodes are formatted in OxO(f)O(s)O(rd)O(th) format
+      This means we have 4 nibbles, offsets are:
+
+      first: >> 12 mover desde la derecha 12 bits
+      second: >> 8 mover desde la derecha 8 bits
+      third: >> 4 mover desde la derecha 4 bits
+
+    */
+
+    uint8_t X = (instruction >> 8) & 0x0F;
+    uint8_t Y = (instruction >> 4) & 0x0F;
+    uint8_t N = instruction & 0x0F; //Gets 4th nibble
+    uint8_t NN = instruction & 0x0FF; //Gets 1.5 nibbles (1 Bytes)
+    uint16_t NNN = instruction & 0x0FFF; //Gets 3 nibbles (1.5 Bytes)
+
+    /* If we want to access first nibble(how chip8 handles opcodes) shift by 12 
+       bitwise-it to remove un. bits.
+    */
+    switch ((instruction >> 12) & 0x0F) {
+        case 0x00:
+
+            switch (NN) {
+                case 0xE0:
+                    printf("R:Clear Screen.\n");
+                    memset(&display[0], false, sizeof display);
+                    break;
+
+                case 0xEE:
+                    printf("R:Return from subroutine.\n");
+                    this->PC = stack.top();
+                    stack.pop();
+                    break;
+
+                default:
+                    printf("E:Unimplemented instruction 0x%04X\n", instruction);
+                    break;
+            }
+
+            break;
+
+        case 0x1:
+            printf("R:Jump from: 0x%04X to: 0x%04X\n",this->PC,NNN);
+            this->PC = NNN;
+            break;
+
+        case 0x02:
+            printf("R:Calling subroutine.\n");
+            stack.push(this->PC);
+            this->PC = NNN;
+            break;
+
+        case 0x06:
+            printf("R:V[%X] Set to 0x%04X\n",X,NN);
+            this->registers[X] = NN;
+            break;
+
+        case 0x07:
+            printf("R:Add NN to V[x]\n");
+            this->registers[X] += NN;
+            break;
+
+        case 0x0A:
+            printf("R:Set I to NNN\n");
+            I = NNN;
+            break;
+
+        case 0x0D:
+        {
+            /*Draws a sprite to screen and sets VF to true, signaling a collision event
+              To draw a sprite you start at the top left of the screen.*/
+
+            printf("R:Draw to Display\n");
+            std::vector<uint32_t> dimen = dimensions;
+
+            uint8_t X_coord = this->registers[X] % dimen[0];
+            uint8_t Y_coord = this->registers[Y] % dimen[1];
+            const uint8_t orig_x = X_coord; //Original X Value
+
+            this->registers[0xF] = 0; //Initialize carry flag to 0
+
+            //Loops all rows of sprites
+            for (uint8_t i = 0; i < N; i++) {
+                const uint8_t sprite_data = this->ram[I + i];
+                X_coord = orig_x; //Reset x for next row draw
+
+                for (int8_t j = 7; j >= 0; j--) {
+                    bool* pixel = &display[Y_coord * dimen[1] + X_coord];
+                    bool sprite_bit = (sprite_data & (1 << j));
+
+                    //If sprite pixel is on and display pixel is on set carry flag
+                    if (sprite_bit && *pixel) {
+                        this->registers[0xF] = 1;
+                    }
+
+                    // Exclusive OR to set pixel on or off
+                    *pixel ^= sprite_bit;
+
+                    if (++X_coord >= dimen[0]) break; //Stop if X of sprite is greater than width
+                }
+
+                if (++Y_coord >= dimen[1]) break; //Stop if Y of sprite is greater than height
+            }
+            break;
+        }
+
+        default:
+            printf("E:Unimplemented instruction 0x%04X\n", instruction);
+            break;
     }
 }

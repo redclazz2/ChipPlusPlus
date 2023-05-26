@@ -1,9 +1,8 @@
 #pragma once
 #include "chip8.h"
-
 #include <iostream>
 #include <SDL.h>
-#include <vector>;
+#include <vector>
 
 class sdl_config {
 	private:
@@ -22,5 +21,6 @@ class sdl_config {
 		~sdl_config();
 	
 		void clear_display();
-		void update_display();		
+		void update_display(chip8* chip);
+		std ::vector<uint32_t> get_window_dimen();
 };
