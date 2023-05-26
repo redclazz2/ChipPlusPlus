@@ -14,6 +14,7 @@
         state = RUNNING;
         this->rom_name = rom_name;
 
+        //FROM: https://tobiasvl.github.io/blog/write-a-chip-8-emulator/#7xnn-add
         const uint8_t font[] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1

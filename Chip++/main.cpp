@@ -1,3 +1,13 @@
+/*
+					  Welcome to My Chip 8 Interpreter/Emulator!
+	I've always wanted to dive into developing an emulator and multiple posts recommend
+	to get your feet wet with the chip 8. Multiple routines are based of the ones present
+	in video series: https://www.youtube.com/watch?v=EW1zXX89pfM&list=PLT7NbkyNWaqbyBMzdySdqjnfUFxt8rnU_&index=2,
+	however, coming from a C# background I'm mostly familiar with OOP so I decided to practice
+	it on C++. Please note this is my first project on C++ and some routines might be (weird)!
+*/
+
+
 #include "sdl_config.h"
 #include "chip8.h"
 
