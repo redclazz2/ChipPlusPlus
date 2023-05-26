@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to My Chip 8 Interpreter/Emulator!</h1>
+<h1 align="center">Welcome to my Chip 8 Interpreter/Emulator!</h1>
 <h3 align="center">First C++ Project</h3>
 
 I've always wanted to dive into developing an emulator and multiple posts recommend
