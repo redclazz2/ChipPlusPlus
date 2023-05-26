@@ -157,7 +157,6 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
     */
     switch ((instruction >> 12) & 0x0F) {
         case 0x00:
-
             switch (NN) {
                 case 0xE0:
                     printf("R:Clear Screen.\n");
@@ -165,16 +164,15 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
                     break;
 
                 case 0xEE:
-                    printf("R:Return from subroutine.\n");
-                    this->PC = stack.top();
-                    stack.pop();
+                    printf("R:Return from subroutine 0x%04X.\n",this->stack.top());
+                    this->PC = this->stack.top();
+                    this->stack.pop();
                     break;
 
                 default:
                     printf("E:Unimplemented instruction 0x%04X\n", instruction);
                     break;
             }
-
             break;
 
         case 0x1:
@@ -183,14 +181,33 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             break;
 
         case 0x02:
-            printf("R:Saving subroutine to stack.\n");
-            stack.push(this->PC);
+            printf("R:Saving subroutine 0x%04X to stack.\n",this->PC);
+            this->stack.push(this->PC);
             this->PC = NNN;
             break;
 
         case 0x03:
-            printf("R:Skipping if VX == NN.\n");
-            if (this->registers[X] == NN) this->PC += 2;
+            printf("R:Skipping if VX(0x%04X) == NN(0x%04X).\n",this->registers[X],NN);
+            if (this->registers[X] == NN) {
+                this->PC += 2;
+                printf("Skipped!\n");
+            }
+            break;
+
+        case 0x04:
+            printf("R:Skipping if VX(0x%04X) != NN(0x%04X).\n",this->registers[X],NN);
+            if (this->registers[X] != NN) {
+                this->PC += 2;
+                printf("Skipped!\n");
+            }
+            break;
+
+        case 0x05:
+            printf("R:Skipping if VX(0x%04X) == VY(0x%04X).\n",this->registers[X],this->registers[Y]);
+            if (this->registers[X] == this->registers[Y]) {
+                this->PC += 2;
+                printf("Skipped!\n");
+            }
             break;
 
         case 0x06:
@@ -203,8 +220,16 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             this->registers[X] += NN;
             break;
 
+        case 0x09:
+            printf("R:Skipping if VX(0x%04X) != VY(0x%04X).\n", this->registers[X], this->registers[Y]);
+            if (this->registers[X] != this->registers[Y]) {
+                this->PC += 2;
+                printf("Skipped!\n");
+            }
+            break;
+
         case 0x0A:
-            printf("R:Set I to NNN\n");
+            printf("R:Set I(0x%04X) to NNN(0x%04X)\n",this->I,NNN);
             this->I = NNN;
             break;
 
