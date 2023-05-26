@@ -86,32 +86,31 @@
 	/// </summary>
 	void sdl_config::update_display(chip8* chip) {
 
-		SDL_Rect rect = { 0,0,scale_factor,scale_factor };
+		SDL_Rect rect = {0,0,this->scale_factor,this->scale_factor};
 
 		std::vector<uint8_t> bcolor = sdl_config_get_rgba(&bg_color);
 		std::vector<uint8_t> fcolor = sdl_config_get_rgba(&fg_color);
 
 		//Loop through display pixels, draw a rectangle per pixel to the SDL Window
 		for (uint32_t i = 0; i < sizeof chip->display; i++) {
-			rect.x = (i % window_width) * scale_factor;
-			rect.y = (i / window_height) * scale_factor;
+			rect.x = (i % this->window_width) * this->scale_factor;
+			rect.y = (i / this->window_width) * this->scale_factor;
 
 			if (chip->display[i]) {
 				//Pixel is on draw foreground
-				SDL_SetRenderDrawColor(renderer, fcolor[0], fcolor[1], fcolor[2], fcolor[3]);
-				SDL_RenderFillRect(renderer, &rect);
+				SDL_SetRenderDrawColor(this->renderer, fcolor[0], fcolor[1], fcolor[2], fcolor[3]);
+				SDL_RenderFillRect(this->renderer, &rect);
 
 				//Adds pixelated effect
-				SDL_SetRenderDrawColor(renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
-				SDL_RenderDrawRect(renderer, &rect);
+				SDL_SetRenderDrawColor(this->renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
+				SDL_RenderDrawRect(this->renderer, &rect);
 			}
 			else {
 				//Pixel is Off
-				SDL_SetRenderDrawColor(renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
-				SDL_RenderFillRect(renderer, &rect);
+				SDL_SetRenderDrawColor(this->renderer, bcolor[0], bcolor[1], bcolor[2], bcolor[3]);
+				SDL_RenderFillRect(this->renderer, &rect);
 			}
 		}
-
 
 		SDL_RenderPresent(this->renderer);
 	}

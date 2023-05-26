@@ -101,11 +101,11 @@ void chip8::handle_input() {
             case SDLK_SPACE:
                 if (state == RUNNING) {
                     state = PAUSED;
-                    printf("----PAUSED----");
+                    printf("----PAUSED----\n");
                 }
                 else {
                     state = RUNNING;
-                    printf("----RESUMED----");
+                    printf("----RESUMED----\n");
                 }
                 break;
             }
@@ -134,8 +134,8 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
     */
 
     uint16_t instruction = (this->ram[this->PC] << 8) | this->ram[this->PC + 1];
-    printf("Address: 0x%04X, Opcode: 0x%04X\n",PC, instruction);
     this->PC += 2;
+    printf("Address: 0x%04X, Opcode: 0x%04X\n",this->PC-2, instruction);
 
     /*Opcodes are formatted in OxO(f)O(s)O(rd)O(th) format
       This means we have 4 nibbles, offsets are:
@@ -161,7 +161,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             switch (NN) {
                 case 0xE0:
                     printf("R:Clear Screen.\n");
-                    memset(&display[0], false, sizeof display);
+                    memset(&display[0], false, sizeof this->display);
                     break;
 
                 case 0xEE:
@@ -183,9 +183,14 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
             break;
 
         case 0x02:
-            printf("R:Calling subroutine.\n");
+            printf("R:Saving subroutine to stack.\n");
             stack.push(this->PC);
             this->PC = NNN;
+            break;
+
+        case 0x03:
+            printf("R:Skipping if VX == NN.\n");
+            if (this->registers[X] == NN) this->PC += 2;
             break;
 
         case 0x06:
@@ -200,7 +205,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
 
         case 0x0A:
             printf("R:Set I to NNN\n");
-            I = NNN;
+            this->I = NNN;
             break;
 
         case 0x0D:
@@ -210,6 +215,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
 
             printf("R:Draw to Display\n");
             std::vector<uint32_t> dimen = dimensions;
+            //std::cout << dimen[0] << " " << dimen[1];
 
             uint8_t X_coord = this->registers[X] % dimen[0];
             uint8_t Y_coord = this->registers[Y] % dimen[1];
@@ -223,7 +229,7 @@ void chip8::handle_instructions(std::vector<uint32_t> dimensions){
                 X_coord = orig_x; //Reset x for next row draw
 
                 for (int8_t j = 7; j >= 0; j--) {
-                    bool* pixel = &display[Y_coord * dimen[1] + X_coord];
+                    bool* pixel = &display[Y_coord * dimen[0] + X_coord];
                     bool sprite_bit = (sprite_data & (1 << j));
 
                     //If sprite pixel is on and display pixel is on set carry flag
